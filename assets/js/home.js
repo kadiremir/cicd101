@@ -5,7 +5,7 @@ const TRACKS = [
     desc: 'Master Jenkins by building real pipelines — stages, failures, artifacts and deploys.',
     snippet: "stage('Build') { sh './gradlew build' }",
     tags: ['Pipelines', 'Stages', 'Agents', 'Artifacts'],
-    status: 'live', href: '/jenkins' },
+    status: 'live', href: 'jenkins/' },
   { code: 'GA', name: 'GitHub Actions', cat: 'WORKFLOWS · YAML CI/CD', accent: '#6EA8FE',
     desc: 'Workflow files, triggers, matrix builds and reusable actions — learned by running them.',
     snippet: 'on: [push]   jobs: { build: … }',
