@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CICD101 — Interactive CI/CD Trainings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/css/home.css">
+</head>
+<body>
+<div id="cf-root">
+  <canvas id="cf-bg"></canvas>
+  <div id="cf-vignette"></div>
+  <div id="cf-spot"></div>
+  <div id="cf-grain"></div>
+
+  <!-- nav -->
+  <nav id="cf-nav">
+    <div class="cf-brand">
+      <svg width="46" height="23" viewBox="0 0 100 50" fill="none" style="flex:0 0 auto;">
+        <path d="M50.00 25.00 L48.29 22.99 L45.68 20.02 L42.91 17.14 L39.92 14.45 L36.61 12.06 L32.93 10.15 L28.86 8.96 L24.47 8.82 L20.01 10.04 L15.89 12.90 L12.72 17.36 L11.11 23.00 L11.00 25.00 L11.98 30.86 L14.69 35.78 L18.57 39.19 L22.98 40.94 L27.42 41.22 L31.61 40.34 L35.43 38.64 L38.86 36.39 L41.95 33.78 L44.78 30.95 L47.43 28.01 L50.00 25.00" pathLength="100" fill="none" stroke="#2DD4BF" stroke-width="8" stroke-linecap="round" style="stroke-dasharray:9 9;animation:march 1.2s linear infinite;"></path>
+        <path d="M50.00 25.00 L51.71 22.99 L54.32 20.02 L57.09 17.14 L60.08 14.45 L63.39 12.06 L67.07 10.15 L71.14 8.96 L75.53 8.82 L79.99 10.04 L84.11 12.90 L87.28 17.36 L88.89 23.00 L89.00 25.00 L88.02 30.86 L85.31 35.78 L81.43 39.19 L77.02 40.94 L72.58 41.22 L68.39 40.34 L64.57 38.64 L61.14 36.39 L58.05 33.78 L55.22 30.95 L52.57 28.01 L50.00 25.00" pathLength="100" fill="none" stroke="#58A6FF" stroke-width="8" stroke-linecap="round" style="stroke-dasharray:9 9;animation:march 1.2s linear infinite;"></path>
+      </svg>
+      <div class="cf-wordmark">
+        <div class="cf-wordmark-name"><span class="ci">CI</span><span class="cd">CD</span>101</div>
+        <div class="cf-wordmark-sub">INTERACTIVE CI/CD TRAININGS</div>
+      </div>
+    </div>
+    <div class="cf-nav-links">
+      <a href="#cf-stage" class="cf-nav-link">Trainings</a>
+      <a href="#connect" class="cf-nav-link">Contact</a>
+      <a href="/jenkins" class="cf-cta-btn">Open Jenkins →</a>
+    </div>
+  </nav>
+
+  <!-- hero -->
+  <section id="cf-hero">
+    <div class="cf-eyebrow"><span class="cf-eyebrow-dot"></span> The CI/CD training catalog</div>
+    <h1>Browse the rack.<br><span class="cf-gradient-text">Build for real.</span></h1>
+    <p>Spin through every track, pick one, and start building actual pipelines in your browser. Drag it, use the arrows, or just watch it turn.</p>
+  </section>
+
+  <!-- 3D coverflow stage -->
+  <div id="cf-stage">
+    <div id="cf-halo"></div>
+    <div id="cf-floor-glow"></div>
+    <div id="cf-track"></div>
+
+    <button id="cf-prev" class="cf-arrow" aria-label="Previous">&#x2039;</button>
+    <button id="cf-next" class="cf-arrow" aria-label="Next">&#x203a;</button>
+  </div>
+
+  <!-- control bar -->
+  <div id="cf-controls">
+    <div class="cf-controls-inner">
+      <span id="cf-idx">01 / 04</span>
+      <div id="cf-dots"></div>
+      <span class="cf-divider"></span>
+      <span class="cf-key-hint"><kbd>←</kbd><kbd>→</kbd> or drag</span>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer id="connect">
+    <div class="cf-footer-grid">
+      <div>
+        <div class="cf-footer-brand">
+          <svg width="34" height="17" viewBox="0 0 100 50" fill="none">
+            <path d="M50.00 25.00 L48.29 22.99 L45.68 20.02 L42.91 17.14 L39.92 14.45 L36.61 12.06 L32.93 10.15 L28.86 8.96 L24.47 8.82 L20.01 10.04 L15.89 12.90 L12.72 17.36 L11.11 23.00 L11.00 25.00 L11.98 30.86 L14.69 35.78 L18.57 39.19 L22.98 40.94 L27.42 41.22 L31.61 40.34 L35.43 38.64 L38.86 36.39 L41.95 33.78 L44.78 30.95 L47.43 28.01 L50.00 25.00" fill="none" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round"></path>
+            <path d="M50.00 25.00 L51.71 22.99 L54.32 20.02 L57.09 17.14 L60.08 14.45 L63.39 12.06 L67.07 10.15 L71.14 8.96 L75.53 8.82 L79.99 10.04 L84.11 12.90 L87.28 17.36 L88.89 23.00 L89.00 25.00 L88.02 30.86 L85.31 35.78 L81.43 39.19 L77.02 40.94 L72.58 41.22 L68.39 40.34 L64.57 38.64 L61.14 36.39 L58.05 33.78 L55.22 30.95 L52.57 28.01 L50.00 25.00" fill="none" stroke="#58A6FF" stroke-width="9" stroke-linecap="round"></path>
+          </svg>
+          <div class="cf-footer-brand-name"><span class="ci">CI</span><span class="cd">CD</span>101</div>
+        </div>
+        <p class="cf-footer-blurb">Interactive, in-browser trainings for the tools modern teams ship with. Built and maintained by one engineer who likes teaching by doing.</p>
+        <div class="cf-footer-url">www.cicd101.com</div>
+      </div>
+      <div>
+        <div class="cf-footer-col-head">Trainings</div>
+        <a href="/jenkins" class="cf-footer-link">Jenkins <span class="cf-footer-live">● live</span></a>
+        <a href="#" class="cf-footer-link dim">GitHub Actions <span style="font-size:11px;">soon</span></a>
+        <a href="#" class="cf-footer-link dim">Kubernetes <span style="font-size:11px;">soon</span></a>
+      </div>
+      <div>
+        <div class="cf-footer-col-head">Connect</div>
+        <a href="https://github.com/kadiremir" class="cf-footer-link">GitHub ↗</a>
+        <a href="https://www.linkedin.com/in/kadiremir/" class="cf-footer-link">LinkedIn ↗</a>
+      </div>
+      <div>
+        <div class="cf-footer-col-head">Contact</div>
+        <a href="mailto:kadiremir86@gmail.com" class="cf-footer-link accent">kadiremir86@gmail.com</a>
+        <p class="cf-footer-note">Open to feedback, new track requests, and collabs.</p>
+      </div>
+    </div>
+    <div class="cf-footer-bar">
+      <span class="cf-footer-copy">© 2026 CICD101 · Built by Your Name</span>
+      <span class="cf-footer-made">made for people who learn by doing</span>
+    </div>
+  </footer>
+</div>
+
+<script src="/assets/js/home.js"></script>
+</body>
+</html>

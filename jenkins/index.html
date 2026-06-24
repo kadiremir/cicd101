@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jenkins101 — Learn Jenkins by Building</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14; --panel:#141925; --panel2:#1b2231; --line:#262e3d;
+    --ink:#E6EDF3; --muted:#8B949E; --amber:#F5A623; --green:#3FB950;
+    --red:#F85149; --blue:#58A6FF; --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:'Space Grotesk',system-ui,sans-serif;overflow-x:hidden;position:relative;}
+
+  /* animated pipeline canvas behind everything */
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+  .vignette{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 0%, transparent 50%, #06080ccc 100%);}
+
+  .shell{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 22px 60px;}
+
+  /* ---------- topbar ---------- */
+  .topbar{display:flex;align-items:center;gap:16px;height:60px;margin-top:14px;padding:0 18px;
+    background:linear-gradient(90deg,#141925cc,#1b2231cc);backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:var(--radius);}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .logo{width:32px;height:32px;border-radius:9px;flex:0 0 auto;position:relative;
+    background:radial-gradient(circle at 35% 30%,#ffcf72,var(--amber) 55%,#b9760f);
+    box-shadow:0 0 18px #f5a62366,inset 0 0 6px #00000044;}
+  .logo::after{content:"";position:absolute;inset:0;border-radius:9px;
+    background:repeating-linear-gradient(90deg,#0000 0 5px,#00000022 5px 6px);}
+  .brand h1{font-size:17px;letter-spacing:.16em;margin:0;font-weight:700;}
+  .brand h1 b{color:var(--amber);font-weight:700;}
+  .brand span{font-size:10.5px;color:var(--muted);letter-spacing:.22em;display:block;margin-top:-1px;}
+  .nav{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .nav a{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 13px;border-radius:9px;transition:.15s;}
+  .nav a:hover{color:var(--ink);background:#ffffff0a;}
+
+  /* ---------- hero ---------- */
+  .hero{padding:78px 8px 56px;text-align:center;}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--amber);font-weight:600;border:1px solid #f5a62333;
+    background:#f5a6230d;padding:7px 14px;border-radius:20px;margin-bottom:26px;
+    animation:rise .7s cubic-bezier(.2,.7,.2,1) both;}
+  .kicker i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green);
+    animation:pulse 1.8s ease-in-out infinite;}
+  .htitle{font-size:clamp(52px,11vw,118px);line-height:.92;font-weight:700;letter-spacing:-.03em;margin:0;
+    animation:rise .8s .05s cubic-bezier(.2,.7,.2,1) both;}
+  .htitle .o{color:var(--amber);text-shadow:0 0 50px #f5a62355;}
+  .lede{max-width:600px;margin:24px auto 0;font-size:clamp(15px,2vw,18px);line-height:1.55;color:#c2ccd8;
+    animation:rise .8s .12s cubic-bezier(.2,.7,.2,1) both;}
+  .lede b{color:var(--ink);font-weight:600;}
+  .cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin-top:34px;
+    animation:rise .8s .18s cubic-bezier(.2,.7,.2,1) both;}
+  .btn{font:inherit;font-weight:700;font-size:15px;letter-spacing:.02em;cursor:pointer;text-decoration:none;
+    border-radius:12px;padding:15px 28px;display:inline-flex;align-items:center;gap:10px;transition:.15s;border:1px solid transparent;}
+  .btn.primary{color:#11151d;background:linear-gradient(180deg,#ffc15a,var(--amber));
+    box-shadow:0 8px 26px #f5a62340,inset 0 1px 0 #ffffff66;}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px #f5a62355,inset 0 1px 0 #ffffff66;}
+  .btn.ghost{color:var(--ink);background:#ffffff08;border-color:var(--line);}
+  .btn.ghost:hover{border-color:var(--amber);color:#fff;transform:translateY(-2px);}
+  .stats{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:46px;
+    animation:rise .8s .26s cubic-bezier(.2,.7,.2,1) both;}
+  .stat{text-align:center;}
+  .stat b{display:block;font-size:24px;font-weight:700;color:var(--ink);font-family:'JetBrains Mono',monospace;}
+  .stat span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
+  .stat b.amber{color:var(--amber);}
+
+  /* ---------- modes ---------- */
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;
+    margin:30px 8px 22px;flex-wrap:wrap;}
+  .sec-head .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);font-weight:600;}
+  .sec-head h2{margin:6px 0 0;font-size:30px;font-weight:700;letter-spacing:-.02em;}
+  .sec-head p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px;text-align:right;}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;} .sec-head p{text-align:left;}}
+
+  .mode{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:linear-gradient(180deg,var(--panel),#10141d);border:1px solid var(--line);
+    border-radius:18px;padding:22px 20px 20px;overflow:hidden;min-height:260px;
+    transition:transform .2s cubic-bezier(.2,.7,.2,1),border-color .2s,box-shadow .2s;
+    animation:rise .7s cubic-bezier(.2,.7,.2,1) both;}
+  .mode::before{content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
+    background:radial-gradient(120% 80% at 50% -10%, var(--glow), transparent 60%);opacity:.5;}
+  .mode:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 18px 40px -16px var(--ac);}
+  .mode .idx{position:absolute;top:16px;right:18px;font-family:'JetBrains Mono',monospace;
+    font-size:12px;color:var(--muted);opacity:.5;}
+  .mode .ic{width:50px;height:50px;border-radius:13px;display:grid;place-items:center;
+    background:#0e1320;border:1px solid var(--line);color:var(--ac);position:relative;
+    box-shadow:inset 0 0 18px var(--glow);transition:.2s;}
+  .mode:hover .ic{box-shadow:inset 0 0 22px var(--glow),0 0 22px -4px var(--ac);transform:translateY(-2px);}
+  .mode .ic svg{width:26px;height:26px;}
+  .mode h3{margin:18px 0 0;font-size:20px;font-weight:700;letter-spacing:-.01em;}
+  .mode p{margin:9px 0 0;font-size:13px;line-height:1.5;color:#aeb8c6;flex:1;}
+  .mtag{position:absolute;top:18px;left:20px;font-size:9.5px;letter-spacing:.16em;font-weight:700;
+    padding:4px 9px;border-radius:20px;text-transform:uppercase;}
+  .mtag.live{color:var(--green);background:#16331f;border:1px solid #3fb95044;}
+  .mtag.soon{color:var(--muted);background:#ffffff08;border:1px solid var(--line);}
+  .mode .ic{margin-top:24px;}
+  .mfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;
+    padding-top:14px;border-top:1px solid var(--line);}
+  .mmeta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.02em;}
+  .mgo{font-size:13px;font-weight:700;color:var(--ac);display:inline-flex;align-items:center;gap:6px;}
+  .mode.locked{cursor:not-allowed;}
+  .mode.locked .mgo{color:var(--muted);}
+  .mode.locked:hover{transform:translateY(-3px);}
+
+  .mode.campaign{--ac:var(--amber);--glow:#f5a6231f;}
+  .mode.chaos{--ac:var(--red);--glow:#f851491c;}
+  .mode.sandbox{--ac:var(--blue);--glow:#58a6ff1c;}
+  .mode.challenges{--ac:var(--green);--glow:#3fb9501c;}
+
+  /* ---------- footer ---------- */
+  footer{margin-top:40px;padding:22px 18px;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;}
+  footer .tech{font-family:'JetBrains Mono',monospace;letter-spacing:.02em;}
+  footer a{color:var(--amber);text-decoration:none;}
+
+  @keyframes rise{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="vignette"></div>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div><h1>JENKINS<b>101</b></h1><span>LEARN JENKINS BY BUILDING</span></div>
+    </div>
+    <nav class="nav">
+      <a href="#modes">Modes</a>
+      <a href="campaign.html">Play</a>
+    </nav>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="kicker"><i></i> CI/CD · Learn by building</div>
+    <h1 class="htitle">JENKINS<span class="o">101</span></h1>
+    <p class="lede">Master continuous delivery the way you actually learn it — <b>by building real pipelines</b>.
+      Drag in stages, watch each commit flow green, and break things on purpose. No setup, all in the browser.</p>
+    <div class="cta">
+      <a class="btn primary" href="campaign.html"><span>▶</span> Start Campaign</a>
+      <a class="btn ghost" href="#modes">Explore game modes</a>
+    </div>
+    <div class="stats">
+      <!-- Chapters/Levels auto-fill from campaign-data.js; the numbers below are a fallback. -->
+      <div class="stat"><b class="amber">4</b><span>Game modes</span></div>
+      <div class="stat"><b id="stat-chapters">1</b><span>Chapters</span></div>
+      <div class="stat"><b id="stat-levels">5</b><span>Levels</span></div>
+      <div class="stat"><b>0</b><span>Setup needed</span></div>
+    </div>
+  </header>
+
+  <!-- MODES -->
+  <section id="modes">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Game modes</div>
+        <h2>Choose how you build</h2>
+      </div>
+      <p>Four ways to play with pipelines — from guided lessons to total chaos.</p>
+    </div>
+
+    <div class="grid">
+      <!-- Campaign (live) -->
+      <a class="mode campaign" href="campaign.html" style="animation-delay:.05s">
+        <span class="mtag live">Playable</span>
+        <span class="idx">01</span>
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 21V4M5 4c3-2 6 2 9 0v8c-3 2-6-2-9 0"/><circle cx="5" cy="21" r="0.6"/>
+          </svg>
+        </div>
+        <h3>Campaign</h3>
+        <p>Guided chapters that teach Jenkins one idea at a time — stages, failures, steps, artifacts. Build real pipelines and reach a green build.</p>
+        <div class="mfoot"><span class="mmeta" id="campaign-meta">1 chapter · 5 levels</span><span class="mgo">Play →</span></div>
+      </a>
+
+      <!-- Chaos Mode -->
+      <div class="mode chaos locked" style="animation-delay:.12s">
+        <span class="mtag soon">Soon</span>
+        <span class="idx">02</span>
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>
+          </svg>
+        </div>
+        <h3>Chaos Mode</h3>
+        <p>Flaky tests, dying agents, random red builds. Everything tries to break — keep the pipeline alive as long as you can.</p>
+        <div class="mfoot"><span class="mmeta">Endless · Survival</span><span class="mgo">Locked ◆</span></div>
+      </div>
+
+      <!-- Sandbox -->
+      <div class="mode sandbox locked" style="animation-delay:.19s">
+        <span class="mtag soon">Soon</span>
+        <span class="idx">03</span>
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/>
+          </svg>
+        </div>
+        <h3>Sandbox</h3>
+        <p>No rules, no objectives. Unlimited stages and steps — design any pipeline you can dream up and just hit run.</p>
+        <div class="mfoot"><span class="mmeta">Freeform · Unlimited</span><span class="mgo">Locked ◆</span></div>
+      </div>
+
+      <!-- Challenges -->
+      <div class="mode challenges locked" style="animation-delay:.26s">
+        <span class="mtag soon">Soon</span>
+        <span class="idx">04</span>
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+          </svg>
+        </div>
+        <h3>Challenges</h3>
+        <p>Bite-sized pipeline puzzles against the clock. Solve, score, and climb the leaderboard one perfect build at a time.</p>
+        <div class="mfoot"><span class="mmeta">12 puzzles · Timed</span><span class="mgo">Locked ◆</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Jenkins101 — a game about building pipelines.</span>
+    <span class="tech">v0.1 · in-browser · <a href="campaign.html">enter campaign →</a></span>
+  </footer>
+</div>
+
+<!-- Same content files campaign.html loads, in the same order, so the stats
+     above can never drift from the actual game. Keep this list identical to the
+     <script> block in campaign.html. -->
+<script src="campaign-data.js"></script>
+<script src="chapters/chapter-1-pipeline-basics.js"></script>
+<script src="chapters/chapter-2-reliable-builds.js"></script>
+<script src="chapters/chapter-3-deploy-beyond.js"></script>
+<script>
+"use strict";
+/* Auto-fill Chapters/Levels from campaign-data.js (counts only playable chapters). */
+(function(){
+  const chapters=(window.CHAPTERS||[]).filter(c=>c.levels&&c.levels.length);
+  if(!chapters.length) return;                 // data file missing → keep static fallback
+  const levels=chapters.reduce((n,c)=>n+c.levels.length,0);
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('stat-chapters', chapters.length);
+  set('stat-levels', levels);
+  const meta=document.getElementById('campaign-meta');
+  if(meta) meta.textContent=chapters.length+' chapter'+(chapters.length>1?'s':'')+' · '+levels+' level'+(levels>1?'s':'');
+})();
+const cv=document.getElementById('bg'), x=cv.getContext('2d');
+const BLUE="88,166,255", AMBER="245,166,35";
+let W=0,H=0,DPR=1,T=0,last=performance.now();
+let motes=[],rails=[];
+
+function glow(px,py,r,c,a){
+  const g=x.createRadialGradient(px,py,0,px,py,r);
+  g.addColorStop(0,`rgba(${c},${a})`); g.addColorStop(.4,`rgba(${c},${a*.4})`); g.addColorStop(1,`rgba(${c},0)`);
+  x.fillStyle=g; x.beginPath(); x.arc(px,py,r,0,6.2832); x.fill();
+}
+function init(){
+  motes=[]; for(let i=0;i<55;i++) motes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,s:Math.random()*.22+.05,p:Math.random()*6.28});
+  rails=[]; const rows=Math.max(3,Math.floor(H/175));
+  for(let i=0;i<rows;i++){ const y=(i+.5)/rows*H + (i%2?18:-12);
+    rails.push({y,blips:3+(i%3),sp:.05+ (i%4)*.02,col:(i%3===0)?AMBER:BLUE}); }
+}
+function size(){
+  DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px';
+  x.setTransform(DPR,0,0,DPR,0,0); init();
+}
+function frame(){
+  requestAnimationFrame(frame);
+  const now=performance.now(); let dt=(now-last)/1000; last=now; if(dt>.05)dt=.05; T+=dt;
+  x.clearRect(0,0,W,H);
+  // dotted grid
+  x.fillStyle='rgba(40,58,92,0.12)'; const gs=36;
+  for(let gx=gs/2;gx<W;gx+=gs) for(let gy=gs/2;gy<H;gy+=gs) x.fillRect(gx,gy,1.3,1.3);
+  x.globalCompositeOperation='lighter';
+  // pipeline rails + flowing blips
+  rails.forEach(r=>{
+    x.strokeStyle=`rgba(${r.col},0.10)`; x.lineWidth=1.4;
+    x.beginPath(); x.moveTo(0,r.y); x.lineTo(W,r.y); x.stroke();
+    for(let k=0;k<r.blips;k++){ const f=((T*r.sp + k/r.blips)%1); glow(f*W,r.y,7,r.col,.5); }
+  });
+  // rising motes
+  motes.forEach(m=>{ m.y-=m.s; if(m.y<-4){ m.y=H+4; m.x=Math.random()*W; }
+    const a=.2+Math.sin(T*1.4+m.p)*.16; glow(m.x,m.y,m.r*5,BLUE,Math.max(0,a)*.2); });
+  x.globalCompositeOperation='source-over';
+}
+addEventListener('resize',size);
+size(); frame();
+</script>
+</body>
+</html>
